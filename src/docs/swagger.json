@@ -111,11 +111,11 @@
         }
       }
     },
-    "/sender/login": {
+    "/v1/users/login": {
       "post": {
-        "tags": ["senders"],
-        "description": "Sinder login",
-        "operationId": "signinSinder",
+        "tags": ["users"],
+        "description": "User login",
+        "operationId": "loginnUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -151,41 +151,30 @@
         }
       }
     },
-    "/auth": {
-      "post": {
-        "tags": ["senders"],
+    "/v1/users/{id}": {
+      "get": {
+        "tags": ["users"],
         "description": "get current user",
-        "operationId": "getCurrentUser",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "the id of the user",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "user",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "enum": ["biker", "sender"]
-                        },
-                        "user": {
-                          "$ref": "#/components/schemas/Biker"
-                        }
-                      }
-                    },
-                    {
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "enum": ["biker", "sender"]
-                        },
-                        "user": {
-                          "$ref": "#/components/schemas/Sender"
-                        }
-                      }
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }

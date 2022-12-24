@@ -1,22 +1,30 @@
 import { StatusCodes } from "http-status-codes";
 import { accoutnActivationTemp } from "./../../services/mailer/templates/account_activation";
 import { sendMail } from "./../../services/mailer/index";
-import { generateToken, TokenPayload, verifyToken } from "./../helpers/token";
+import { generateToken, verifyToken } from "./../helpers/token";
 import { usersRepository } from "../../db";
-import { hashPassword } from "./../helpers/hashing";
+import { hashPassword, verifyPassword } from "./../helpers/hashing";
 import {
   badRequestResponse,
   databaseResponse,
   failedValidationResponse,
   invalidAuthenticationTokenResponse,
+  invalidCredentialsResponse,
+  notFoundResponse,
   serverErrorResponse,
 } from "./../helpers/errors";
-import { ToeknDto, UserRegisterDTO } from "./../../db/dto/users.dto";
+import {
+  IDParamDto,
+  ToeknDto,
+  UserLoginDto,
+  UserRegisterDTO,
+} from "./../../db/dto/users.dto";
 import { plainToClass } from "class-transformer";
 import { NextFunction, Response } from "express";
 import { IRequest } from "../../types";
 import { validateSync } from "class-validator";
 import { InsertResult } from "typeorm";
+import { User } from "src/db/entities/User";
 
 export const RegisterUserHandler = async (
   req: IRequest,
@@ -126,4 +134,91 @@ export const activateUserHandler = async (
   });
 };
 
+export const loginHandler = async (
+  req: IRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const input = plainToClass(UserLoginDto, req.body);
+
+  const errors = validateSync(input);
+  if (errors.length > 0) {
+    return next(failedValidationResponse(errors[0]));
+  }
+
+  let user: User | null;
+
+  try {
+    user = await usersRepository.findOne({
+      where: {
+        email: input.email,
+      },
+    });
+  } catch (err) {
+    return next(serverErrorResponse(err));
+  }
+
+  if (!user) {
+    return next(invalidCredentialsResponse());
+  }
+  let isPasswordSame = false;
+  try {
+    isPasswordSame = await verifyPassword(user.hashed_password, input.password);
+  } catch (err) {
+    return next(serverErrorResponse(err));
+  }
+
+  if (!isPasswordSame) {
+    return next(invalidCredentialsResponse());
+  }
+
+  user.hashed_password = "";
+
+  return res.status(StatusCodes.CREATED).json({
+    token: generateToken(
+      {
+        email: user.email,
+        id: user.id,
+      },
+      "30"
+    ),
+    user,
+  });
+};
+export const getUserHandler = async (
+  req: IRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const params = plainToClass(IDParamDto, req.params);
+
+  const errors = validateSync(params);
+  if (errors.length > 0) {
+    return next(failedValidationResponse(errors[0]));
+  }
+  let user: User | null;
+  try {
+    user = await usersRepository.findOne({
+      where: {
+        id: params.id,
+      },
+      select: {
+        email: true,
+        name: true,
+        id: true,
+        is_blocked: true,
+        updated_at: true,
+        created_at: true,
+        activated: true,
+      },
+    });
+  } catch (err) {
+    return next(serverErrorResponse(err));
+  }
+  if (!user) {
+    return next(notFoundResponse());
+  }
+
+  res.status(StatusCodes.OK).json(user);
+};
 // To-Do: make a handler to resend email to the users.
