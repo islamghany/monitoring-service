@@ -1,4 +1,11 @@
+import { isInstance, ValidationError } from "class-validator";
 import { StatusCodes } from "http-status-codes";
+import { QueryFailedError } from "typeorm";
+
+const generateErrorFromDto = (err: ValidationError) => {
+  return Object.values(err.constraints || [])[0];
+};
+
 export class HttpError extends Error {
   code: number;
   message: string;
@@ -14,11 +21,13 @@ export class HttpError extends Error {
 export const errorResponse = (message: string, code: number) =>
   new HttpError(message, code);
 
-export const serverErrorResponse = (err: Error) =>
-  errorResponse(
+export const serverErrorResponse = (err: any) => {
+  console.error(err);
+  return errorResponse(
     "the server encountered a problem and could not process your request",
     StatusCodes.INTERNAL_SERVER_ERROR
   );
+};
 
 export const notFoundResponse = () =>
   errorResponse(
@@ -43,3 +52,14 @@ export const invalidAuthenticationTokenResponse = () =>
     "invalid or missing authentication token",
     StatusCodes.UNAUTHORIZED
   );
+
+export const failedValidationResponse = (err: ValidationError) =>
+  errorResponse(generateErrorFromDto(err), StatusCodes.UNPROCESSABLE_ENTITY);
+
+export const databaseResponse = (err: any) => {
+  if (err instanceof QueryFailedError) {
+    return errorResponse(err.driverError.detail, StatusCodes.CONFLICT);
+  } else {
+    return serverErrorResponse(err);
+  }
+};

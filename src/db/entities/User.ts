@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Length, IsEmail, Min, Max } from "class-validator";
 import { Check } from "./Check";
 
 @Entity()
@@ -19,7 +18,6 @@ export class User {
     type: "text",
     nullable: false,
   })
-  @Length(4, 50)
   name: string;
 
   @Column({
@@ -27,7 +25,6 @@ export class User {
     nullable: false,
     unique: true,
   })
-  @Length(4, 50)
   username: string;
 
   @Column({
@@ -35,13 +32,25 @@ export class User {
     nullable: false,
     unique: true,
   })
-  @IsEmail()
   email: string;
 
-  @Column()
-  @Min(6)
-  @Max(72)
-  password: string;
+  @Column({
+    type: "text",
+    nullable: false,
+  })
+  hashed_password: string;
+
+  @Column({
+    type: "bool",
+    default: false,
+  })
+  activated: boolean;
+
+  @Column({
+    type: "bool",
+    default: false,
+  })
+  is_blocked: boolean;
 
   @CreateDateColumn()
   created_at: Date;

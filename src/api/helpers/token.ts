@@ -5,10 +5,13 @@ export interface TokenPayload {
   email: string;
 }
 const privateKey = process.env?.PRIVATE_KEY as string;
-export const generateToken = (payload: TokenPayload) => {
+export const generateToken = (
+  payload: TokenPayload,
+  ttl: string | number | undefined
+) => {
   try {
     const token = jwt.sign(payload, privateKey, {
-      expiresIn: "30d",
+      expiresIn: ttl,
     });
     return token;
   } catch (err) {
@@ -26,6 +29,6 @@ export const verifyToken = (token: string): TokenPayload | undefined => {
       };
     }
   } catch (err) {
-    throw err;
+    return undefined;
   }
 };

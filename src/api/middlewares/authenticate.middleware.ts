@@ -1,12 +1,7 @@
 import { IRequest } from "../../types/index";
 import { TokenPayload, verifyToken } from "./../helpers/token";
 import { NextFunction, Response } from "express";
-import {
-  authenticationRequiredResponse,
-  invalidAuthenticationTokenResponse,
-  serverErrorResponse,
-} from "../helpers/errors";
-//import { bikerRepository, senderRepository } from "../db";
+import { serverErrorResponse } from "../helpers/errors";
 
 export const authenticate = (
   req: IRequest,

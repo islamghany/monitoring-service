@@ -1,11 +1,12 @@
 import { Router } from "express";
-
+import { RegisterUserHandler, activateUserHandler } from "../handlers";
 const usersRoutes = Router();
 
-usersRoutes.post("/register");
+usersRoutes.post("/", RegisterUserHandler);
+
+usersRoutes.put("/activate", activateUserHandler);
 
 usersRoutes.post("/login");
-
-usersRoutes.patch("/activate");
+usersRoutes.get("/id");
 
 export default usersRoutes;
