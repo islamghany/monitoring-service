@@ -26,7 +26,7 @@ app.use(express.json());
 app.use("/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/v1/users", usersRoutes);
-app.use("v1//checks", checksRoutes);
+app.use("/v1/checks", checksRoutes);
 app.use("/v1/reports", reportsRoutes);
 
 app.use("*", (req, res, next) => {

@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
@@ -39,7 +38,6 @@ export class Report {
   @Column({
     type: "int8",
     default: 0,
-    name: "alert_times",
   })
   alertTimes: number;
 
@@ -56,11 +54,10 @@ export class Report {
   uptime: number;
 
   @Column({
-    type: "float",
+    type: "simple-array",
     nullable: false,
-    name: "response_times",
   })
-  responseTime: number;
+  responseTimes: number[];
 
   @Column({
     type: "simple-array",
@@ -68,10 +65,10 @@ export class Report {
   })
   history: Date[];
 
-  @OneToOne(() => Check, {
-    onDelete: "CASCADE",
-  })
-  check: Check;
+  // @OneToOne(() => Check, {
+  //   onDelete: "CASCADE",
+  // })
+  // check: Check;
 
   @CreateDateColumn({
     name: "created_at",

@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { QueryFailedError } from "typeorm";
 
 const generateErrorFromDto = (err: ValidationError) => {
-  return Object.values(err.constraints || [])[0];
+  return Object.values(err.constraints || [])[0] || err?.property + " invalid";
 };
 
 export class HttpError extends Error {
@@ -63,3 +63,9 @@ export const databaseResponse = (err: any) => {
     return serverErrorResponse(err);
   }
 };
+
+export const inactiveAccountResponse = () =>
+  errorResponse(
+    "your user account must be activated to access this resource",
+    StatusCodes.FORBIDDEN
+  );

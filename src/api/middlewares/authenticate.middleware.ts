@@ -26,10 +26,7 @@ export const authenticate = (
   if (typeof decodedToken === "undefined") {
     return next();
   }
-  req.auth = {
-    email: decodedToken.email,
-    id: decodedToken.id,
-  };
+  req.id = decodedToken.id;
 
   return next();
 };

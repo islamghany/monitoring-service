@@ -6,12 +6,16 @@ import {
   ManyToOne,
   UpdateDateColumn,
   OneToOne,
+  JoinColumn,
 } from "typeorm";
-import { IsUrl, isURL } from "class-validator";
 import { ProtocolTypes } from "../../types/enums";
 import { Report } from "./Report";
 import { User } from "./User";
 
+class Header {
+  key: string;
+  value: string;
+}
 @Entity()
 export class Check {
   @PrimaryGeneratedColumn()
@@ -27,7 +31,6 @@ export class Check {
     nullable: false,
     type: "text",
   })
-  @IsUrl()
   url: string;
 
   @Column({
@@ -44,13 +47,14 @@ export class Check {
 
   @Column({
     type: "int8",
+    nullable: true,
   })
   port: number;
 
   @Column({
     type: "text",
+    nullable: true,
   })
-  @IsUrl()
   webhook: string;
 
   @Column({
@@ -73,31 +77,34 @@ export class Check {
 
   @Column({
     type: "simple-json",
+    nullable: true,
   })
   authentication: {
     username: string;
     password: string;
   };
 
-  @Column({
-    type: "simple-json",
-    name: "http_headers",
+  @Column("jsonb", {
+    nullable: true,
   })
-  httpHeaders: { key: string; value: string }[];
+  httpHeaders: Header[];
 
   @Column({
     type: "simple-json",
+    nullable: true,
   })
   asserts: { code: number };
 
   @Column({
-    type: "simple-array",
+    type: "text",
+    array: true,
+    default: [],
   })
   tags: string[];
 
   @Column({
     type: "bool",
-    name: "ignore_ssl",
+    default: false,
   })
   ignoreSSL: boolean;
 
@@ -107,7 +114,8 @@ export class Check {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToOne(() => Report)
+  @OneToOne(() => Report, { nullable: false })
+  @JoinColumn()
   report: Report;
 
   @ManyToOne(() => User, (user) => user.checks, {

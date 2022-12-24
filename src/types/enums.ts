@@ -4,7 +4,7 @@ export enum ServerStatus {
 }
 
 export enum ProtocolTypes {
-  HTTP,
-  HTTPs,
-  TCP,
+  HTTP = "HTTP",
+  HTTPs = "HTTPS",
+  TCP = "TCP",
 }
