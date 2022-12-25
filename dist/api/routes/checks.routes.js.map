@@ -1,1 +1,0 @@
-{"version":3,"file":"checks.routes.js","sourceRoot":"","sources":["../../../src/api/routes/checks.routes.ts"],"names":[],"mappings":";;AAAA,qCAAiC;AAEjC,MAAM,YAAY,GAAG,IAAA,gBAAM,GAAE,CAAC;AAE9B,YAAY,CAAC,GAAG,CAAC,GAAG,CAAC,CAAC;AAEtB,YAAY,CAAC,GAAG,CAAC,MAAM,CAAC,CAAC,GAAG,CAAC,EAAE,CAAC,CAAC,MAAM,CAAC,EAAE,CAAC,CAAC,KAAK,CAAC,EAAE,CAAC,CAAC;AAEtD,kBAAe,YAAY,CAAC"}

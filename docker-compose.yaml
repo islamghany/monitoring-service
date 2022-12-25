@@ -1,0 +1,39 @@
+version: "3.3"
+services:
+ 
+  postgres:
+      image: postgres:12-alpine
+      restart: always
+      environment:
+        - POSTGRES_USER=root
+        - POSTGRES_PASSWORD=islamghany
+        - POSTGRES_DB=monitoring
+      networks:
+        monitoring-net:
+      volumes:
+        - ./data/db-data/postgres/:/var/lib/postgres/data
+
+  monitoring-service:
+    build:
+        context: ./monitoring-service
+        dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - PRIVATE_KEY="*F-JaNdRgUkXn2r5u8x/A?D(G+KbPeShVmYq3s6v9yB&E)H@McQfTjWnZr4u7w!"
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=islamghany
+      - POSTGRES_DB=monitoring
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=postgres
+      - PORT=8080
+      - NODE_ENV=development
+      
+    networks:
+        monitoring-net:
+    ports:
+        - "8080:8080"
+
+
+networks:
+  monitoring-net:

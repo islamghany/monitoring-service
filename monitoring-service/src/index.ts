@@ -9,9 +9,14 @@ import AppDataSource from "./db/index";
 import { notFoundResponse, HttpError } from "./api/helpers/errors";
 
 // docs
+import fs from "fs";
+import path from "path";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "./docs/swagger.json";
 
+const swaggerData = fs.readFileSync(
+  path.join(__dirname, "../swagger.json"),
+  "utf8"
+);
 // routes
 import usersRoutes from "./api/routes/users.routes";
 import checksRoutes from "./api/routes/checks.routes";
@@ -22,6 +27,8 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 
 app.use(express.json());
+
+const swaggerDocument = JSON.parse(swaggerData);
 
 app.use("/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
