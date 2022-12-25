@@ -18,7 +18,7 @@ interface SendMailParams {
   subject: string;
   body: string;
 }
-export const sendMail = ({ email, subject, body }: SendMailParams) => {
+export const sendViaMail = ({ email, subject, body }: SendMailParams) => {
   transport
     .sendMail({
       from: MonitoringServiceMail,

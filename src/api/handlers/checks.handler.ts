@@ -1,6 +1,5 @@
 import { Check } from "../../db/entities/Check";
-import { ServerStatus } from "./../../types/enums";
-import { InsertResult } from "typeorm";
+
 import { notFoundResponse, serverErrorResponse } from "./../helpers/errors";
 import AppDataSource, {
   checksRepository,
@@ -12,6 +11,7 @@ import { Response, NextFunction } from "express";
 import { CreateCheckDto, IDParamDto, ListCheckParamsDto } from "../../db/dto";
 import { IRequest } from "../../types";
 import { failedValidationResponse } from "../helpers/errors";
+import { createReport, updateReport } from "./reports.handlers";
 
 export const createCheck = async (
   req: IRequest,
@@ -27,39 +27,47 @@ export const createCheck = async (
   }
 
   let checkPlaceholder: any = input;
-
+  let intervalId: number | string = 0;
   try {
-    //run a tracnaction;
-    const report = await reportsRepository.insert({
-      status: ServerStatus.UP,
-      availability: 0,
-      outages: 0,
-      responseTimes: [],
-      history: [],
-    });
-    if (report.raw?.length === 0) {
-      next(serverErrorResponse("no rows was added in checks"));
-    }
+    // #TODO : wrap this block with a transaction
+
     const check = await checksRepository.insert({
       ...checkPlaceholder,
       user: {
         id: req.user?.id,
       },
+    });
+
+    if (check.raw?.length === 0) {
+      // rollback
+      next(serverErrorResponse("no rows was added in checks"));
+    }
+    const checkId = check.raw[0].id;
+
+    const report = await createReport();
+
+    if (report.raw?.length === 0) {
+      // rollback
+      next(serverErrorResponse("no rows was added in report"));
+    }
+
+    intervalId = setInterval(updateReport, input.interval * 60 * 1000, checkId);
+    console.log(intervalId);
+
+    const updatedCheck = checksRepository.update(checkId, {
+      intervalId: +intervalId,
       report: {
         id: report.raw[0].id,
       },
     });
-    if (check.raw?.length === 0) {
-      next(serverErrorResponse("no rows was added in checks"));
-    }
 
-    check.generatedMaps;
     return res.json({
       ...input,
       ...check.raw[0],
     });
   } catch (err) {
-    next(serverErrorResponse(err));
+    if (intervalId) clearInterval(intervalId);
+    return next(serverErrorResponse(err));
   }
 };
 

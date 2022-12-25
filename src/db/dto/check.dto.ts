@@ -21,6 +21,7 @@ import {
   ValidateNested,
   IsArray,
   IsBoolean,
+  IsPositive,
 } from "class-validator";
 
 import { Type } from "class-transformer";
@@ -84,14 +85,17 @@ export class CreateCheckDto {
   webhook: string;
 
   @IsOptional()
+  @IsPositive()
   @IsInt()
   timeout: number;
 
   @IsOptional()
+  @IsPositive()
   @IsInt()
   interval: number;
 
   @IsOptional()
+  @IsPositive()
   @IsInt()
   threshold: number;
 

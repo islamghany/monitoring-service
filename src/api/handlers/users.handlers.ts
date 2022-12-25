@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { accoutnActivationTemp } from "./../../services/mailer/templates/account_activation";
-import { sendMail } from "./../../services/mailer/index";
+import { sendViaMail } from "../../services";
 import { generateToken, verifyToken } from "./../helpers/token";
 import { usersRepository } from "../../db";
 import { hashPassword, verifyPassword } from "./../helpers/hashing";
@@ -70,7 +70,7 @@ export const RegisterUserHandler = async (
   );
 
   try {
-    sendMail({
+    sendViaMail({
       email: input.email,
       subject: "Activate Your Accunt",
       body: accoutnActivationTemp(userID, activationToken, "30 min"),
@@ -221,4 +221,6 @@ export const getUserHandler = async (
 
   res.status(StatusCodes.OK).json(user);
 };
+
+const notifyUser = () => {};
 // To-Do: make a handler to resend email to the users.

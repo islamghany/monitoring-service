@@ -71,6 +71,12 @@ export class Check {
 
   @Column({
     type: "int",
+    nullable: true,
+  })
+  intervalId: number;
+
+  @Column({
+    type: "int",
     default: 1,
   })
   threshold: number;
@@ -87,7 +93,7 @@ export class Check {
   @Column("jsonb", {
     nullable: true,
   })
-  httpHeaders: Header[];
+  httpHeaders: Record<string, string>[];
 
   @Column({
     type: "simple-json",
@@ -114,7 +120,7 @@ export class Check {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToOne(() => Report, { nullable: false })
+  @OneToOne(() => Report, { nullable: true })
   @JoinColumn()
   report: Report;
 

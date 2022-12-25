@@ -43,25 +43,27 @@ export class Report {
 
   @Column({
     type: "bigint",
-    default: 0,
+    default: 1,
   })
   downtime: number;
 
   @Column({
     type: "bigint",
-    default: 0,
+    default: 1,
   })
   uptime: number;
 
   @Column({
-    type: "simple-array",
-    nullable: false,
+    type: "int",
+    array: true,
+    default: [],
   })
   responseTimes: number[];
 
   @Column({
-    type: "simple-array",
-    nullable: false,
+    type: "date",
+    array: true,
+    default: [],
   })
   history: Date[];
 

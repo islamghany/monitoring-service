@@ -1,7 +1,7 @@
 require("dotenv").config();
 import express, { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-
+import { logger } from "./pkgs";
 // db initializer
 import AppDataSource from "./db/index";
 
@@ -47,7 +47,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 AppDataSource.initialize()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(
+      logger.info(
         `⚡️[server]: Server is running at https://localhost:${PORT}`
       );
     });
@@ -59,25 +59,25 @@ AppDataSource.initialize()
 
 //Handle unhandled promise rejections.
 process.on("unhandledRejection", (err: Error, promise: Promise<any>) => {
-  console.log(err.name, err.message);
-  console.log("UNHANDLED REJECTION! 💥 Shutting down...");
+  logger.error(err.message, err.name);
+  logger.error("UNHANDLED REJECTION! 💥 Shutting down...");
   process.exit(1);
   throw err;
 });
 
 // Handle programmer errors.
 process.on("uncaughtException", (err: Error) => {
-  console.log(err.name, err.message);
-  console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  logger.error(err.message, err.name);
+  logger.error("UNHANDLED REJECTION! 💥 Shutting down...");
   process.exit(1);
 });
 
 // handle gracefully shutdown when terminating the server CTRL+C
 process.on("SIGTERM", () => {
-  console.log("TERMINATING THE SERVER! 💥 Shutting down...");
+  logger.error("TERMINATING THE SERVER! 💥 Shutting down...");
   process.exit(1);
 });
 process.on("SIGINT", () => {
-  console.log("TERMINATING THE SERVER! 💥 Shutting down...");
+  logger.error("TERMINATING THE SERVER! 💥 Shutting down...");
   process.exit(1);
 });
