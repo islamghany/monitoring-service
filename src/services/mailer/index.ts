@@ -1,8 +1,9 @@
 import nodemailer from "nodemailer";
+import { config } from "../../config";
 export { accoutnActivationTemp, reporting } from "./templates";
 
-const MonitoringServiceMail = "dump.dumper77@gmail.com";
-const MonitoringServicePassword = "jgescovftryciaso";
+const MonitoringServiceMail = config.MONITORING_EMAIL;
+const MonitoringServicePassword = config.MONITORING_EMAIL_PASSWORD;
 
 const transport = nodemailer.createTransport({
   service: "Gmail",
@@ -11,8 +12,6 @@ const transport = nodemailer.createTransport({
     pass: MonitoringServicePassword,
   },
 });
-
-//jgescovftryciaso
 
 interface SendMailParams {
   email: string;
