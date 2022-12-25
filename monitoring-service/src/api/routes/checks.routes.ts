@@ -1,7 +1,12 @@
 import { Router } from "express";
 
-import { createCheck, getCheck, listChecks } from "../handlers/checks.handler";
-import { asyncWrapper } from "../helpers/asyncWrapper";
+import {
+  createCheck,
+  getCheck,
+  listChecks,
+  updateCheck,
+  deleteCheck,
+} from "../handlers/checks.handler";
 
 import {
   authenticate,
@@ -15,6 +20,6 @@ checksRoutes.use(authenticate, requiredAuthentication, requireActivatedUser);
 
 checksRoutes.route("").get(listChecks).post(createCheck);
 
-checksRoutes.route("/:id").get(getCheck);
+checksRoutes.route("/:id").get(getCheck).patch(updateCheck).delete(deleteCheck);
 
 export default checksRoutes;

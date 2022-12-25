@@ -33,13 +33,16 @@ const notifyUserForReport = async (check: Check, status: string) => {
   }
 };
 
-export const createReport = () =>
+export const createReport = (checkID: number) =>
   reportsRepository.insert({
     status: ServerStatus.UP,
     availability: 0,
     outages: 0,
     responseTimes: [],
     history: [],
+    check: {
+      id: checkID,
+    },
   });
 
 const monitorCheck = async (

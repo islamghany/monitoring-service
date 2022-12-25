@@ -20,7 +20,6 @@ const swaggerData = fs.readFileSync(
 // routes
 import usersRoutes from "./api/routes/users.routes";
 import checksRoutes from "./api/routes/checks.routes";
-import reportsRoutes from "./api/routes/reports.routes";
 
 const PORT = process.env.PORT || 8080;
 
@@ -34,7 +33,6 @@ app.use("/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/v1/users", usersRoutes);
 app.use("/v1/checks", checksRoutes);
-app.use("/v1/reports", reportsRoutes);
 
 app.use("*", (req, res, next) => {
   next(notFoundResponse());
@@ -53,10 +51,12 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 
 AppDataSource.initialize()
   .then(() => {
-    app.listen(PORT, () => {
-      logger.info(
-        `⚡️[server]: Server is running at https://localhost:${PORT}`
-      );
+    AppDataSource.runMigrations().then(() => {
+      app.listen(PORT, () => {
+        logger.info(
+          `⚡️[server]: Server is running at https://localhost:${PORT}`
+        );
+      });
     });
   })
   .catch((err) => console.error(err));

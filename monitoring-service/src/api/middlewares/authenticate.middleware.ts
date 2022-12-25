@@ -18,15 +18,13 @@ export const authenticate = (
 
   try {
     decodedToken = verifyToken(token);
-
-    decodedToken;
   } catch (err: any) {
     return next(serverErrorResponse(err));
   }
-
   if (typeof decodedToken === "undefined") {
     return next();
   }
+
   req.id = decodedToken.id;
 
   return next();

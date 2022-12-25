@@ -293,7 +293,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "the id of the user",
+            "description": "the id of the check",
             "required": true,
             "schema": {
               "type": "integer"
@@ -321,18 +321,67 @@
             "$ref": "#/components/responses/ServerError"
           }
         }
-      }
-    },
-    "/v1/report/{id}": {
-      "get": {
-        "tags": ["reports"],
-        "description": "obtain Report",
-        "operationId": "getReport",
+      },
+
+      "patch": {
+        "tags": ["checks"],
+        "description": "update check",
+        "operationId": "updateCheck",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "the id of the user",
+            "description": "the id of the check",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationRequiredResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/FailedValidationResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+
+      "delete": {
+        "tags": ["checks"],
+        "description": "delete check",
+        "operationId": "deleteCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "the id of the check",
             "required": true,
             "schema": {
               "type": "integer"
@@ -345,7 +394,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Report"
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             }
@@ -781,6 +830,18 @@
         }
       }
     },
-    "requestBodies": {}
-  }
+    "requestBodies": {},
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }

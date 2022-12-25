@@ -4,6 +4,7 @@ import { User } from "./entities/User";
 import { Check } from "./entities/Check";
 import { Report } from "./entities/Report";
 import { config } from "../config";
+import { Insert1671997068936 } from "./migrations/1671997068936-Insert";
 
 const AppDataSource = new DataSource({
   entities: [User, Check, Report],
@@ -16,6 +17,7 @@ const AppDataSource = new DataSource({
   username: config.POSTGRES_USER,
   password: config.POSTGRES_PASSWORD,
   database: config.POSTGRES_DB,
+  migrations: [Insert1671997068936],
 });
 
 export const usersRepository = AppDataSource.getRepository(User);

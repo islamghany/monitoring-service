@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  JoinColumn,
 } from "typeorm";
 import { Check } from "./Check";
 import { IsNumber } from "class-validator";
@@ -67,10 +68,12 @@ export class Report {
   })
   history: Date[];
 
-  // @OneToOne(() => Check, {
-  //   onDelete: "CASCADE",
-  // })
-  // check: Check;
+  @OneToOne(() => Check, {
+    onDelete: "CASCADE",
+    nullable: true,
+  })
+  @JoinColumn()
+  check: Check;
 
   @CreateDateColumn({
     name: "created_at",

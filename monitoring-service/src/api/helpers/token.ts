@@ -29,6 +29,7 @@ export const verifyToken = (token: string): TokenPayload | undefined => {
       };
     }
   } catch (err) {
+    console.log(err);
     return undefined;
   }
 };

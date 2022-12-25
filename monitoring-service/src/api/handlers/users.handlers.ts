@@ -66,7 +66,7 @@ export const RegisterUserHandler = async (
       email: input.email,
       id: userID,
     },
-    "1d"
+    "30 min"
   );
 
   try {
@@ -180,7 +180,7 @@ export const loginHandler = async (
         email: user.email,
         id: user.id,
       },
-      "30"
+      "30d"
     ),
     user,
   });
