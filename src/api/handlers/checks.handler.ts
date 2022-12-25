@@ -1,10 +1,11 @@
-import { Check } from "../../db/entities/Check";
+import { StatusCodes } from "http-status-codes";
 
-import { notFoundResponse, serverErrorResponse } from "./../helpers/errors";
-import AppDataSource, {
-  checksRepository,
-  reportsRepository,
-} from "./../../db/index";
+import {
+  notFoundResponse,
+  serverErrorResponse,
+  errorResponse,
+} from "./../helpers/errors";
+import { checksRepository } from "./../../db/index";
 import { plainToClass } from "class-transformer";
 import { validateSync } from "class-validator";
 import { Response, NextFunction } from "express";
@@ -25,7 +26,11 @@ export const createCheck = async (
   if (errors.length > 0) {
     return next(failedValidationResponse(errors[0]));
   }
-
+  try {
+    new URL(input.url);
+  } catch (err) {
+    return next(errorResponse("invalid url", StatusCodes.UNPROCESSABLE_ENTITY));
+  }
   let checkPlaceholder: any = input;
   let intervalId: number | string = 0;
   try {
@@ -51,8 +56,7 @@ export const createCheck = async (
       next(serverErrorResponse("no rows was added in report"));
     }
 
-    intervalId = setInterval(updateReport, input.interval * 60 * 1000, checkId);
-    console.log(intervalId);
+    intervalId = setInterval(updateReport, input.interval * 30 * 1000, checkId);
 
     const updatedCheck = checksRepository.update(checkId, {
       intervalId: +intervalId,
@@ -133,7 +137,6 @@ export const getCheck = async (
     if (!check) {
       return next(notFoundResponse());
     }
-    console.log(check.report);
     return res.json(check);
   } catch (err) {
     next(serverErrorResponse(err));

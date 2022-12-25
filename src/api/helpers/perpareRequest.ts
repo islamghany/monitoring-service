@@ -15,10 +15,14 @@ const buildURL = (check: Check) => {
   return url.href;
 };
 
-export const prepareRequest = (check: Check) => {
+export interface PrepareRequestType {
+  url: string;
+  requestOptions: AxiosRequestConfig<any>;
+}
+export const prepareRequest = (check: Check): PrepareRequestType => {
   let requestOptions: AxiosRequestConfig<any> = {
     auth: check.authentication || undefined,
-    headers: check.httpHeaders.reduce((x, y) => ({ ...y, ...x })) || undefined,
+    headers: check.httpHeaders?.reduce((x, y) => ({ ...y, ...x })) || undefined,
     timeout: check.timeout * 1000,
     httpAgent: check.ignoreSSL
       ? new Agent({

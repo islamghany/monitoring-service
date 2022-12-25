@@ -234,9 +234,9 @@
         }
       },
       "get": {
-        "tags": ["reports"],
+        "tags": ["checks"],
         "description": "obtain Report",
-        "operationId": "getReports",
+        "operationId": "getRChecks",
         "parameters": [
           {
             "name": "name",
@@ -635,11 +635,7 @@
           "httpHeaders": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "key": { "type": "string" },
-                "value": { "type": "string" }
-              }
+              "type": "object"
             }
           },
           "tags": {

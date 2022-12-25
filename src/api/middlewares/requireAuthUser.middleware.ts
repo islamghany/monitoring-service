@@ -13,6 +13,9 @@ export const requiredAuthentication = async (
 ) => {
   const id = req.id;
 
+  if (!id) {
+    return next(authenticationRequiredResponse());
+  }
   try {
     const user = await usersRepository.findOne({
       where: {

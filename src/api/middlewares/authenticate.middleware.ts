@@ -9,6 +9,7 @@ export const authenticate = (
   next: NextFunction
 ) => {
   let token = req.headers.authorization?.split(" ")[1] || undefined;
+
   if (!token) {
     return next();
   }

@@ -42,6 +42,7 @@ export class Check {
 
   @Column({
     type: "text",
+    nullable: true,
   })
   path: string;
 

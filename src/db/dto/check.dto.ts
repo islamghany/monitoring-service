@@ -107,9 +107,7 @@ export class CreateCheckDto {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HttpHeadersDto)
-  httpHeaders: AuthDTO[];
+  httpHeaders: Record<string, string>[];
 
   @IsOptional()
   @IsObject()

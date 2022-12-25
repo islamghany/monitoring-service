@@ -4,7 +4,7 @@ import api from "../helpers/api";
 import { Check } from "./../../db/entities/Check";
 import { logger } from "../../pkgs";
 import { ServerStatus } from "../../types/enums";
-import { prepareRequest } from "../helpers/perpareRequest";
+import { prepareRequest, PrepareRequestType } from "../helpers/perpareRequest";
 import { checksRepository, reportsRepository } from "./../../db/index";
 import { NotifyOption } from "../../types";
 
@@ -60,8 +60,9 @@ const monitorCheck = async (
     };
   }
 };
-export const updateReport = async (checkID: number, intervalID: any) => {
+export const updateReport = async (checkID: number) => {
   let check: Check | null = null;
+  let intervalID: any = 0;
   try {
     check = await checksRepository.findOne({
       where: {
@@ -85,8 +86,17 @@ export const updateReport = async (checkID: number, intervalID: any) => {
     );
     return;
   }
+  intervalID = check.intervalId;
 
-  const requestData = prepareRequest(check);
+  let requestData: PrepareRequestType;
+  try {
+    requestData = prepareRequest(check);
+  } catch (err) {
+    clearInterval(intervalID);
+    logger.error(`invalid url ${check.url}`);
+    return;
+  }
+
   let notifyOption: NotifyOption = { notify: false, status: ServerStatus.UP };
 
   let duration = 0;
@@ -108,7 +118,7 @@ export const updateReport = async (checkID: number, intervalID: any) => {
       if (check.threshold !== 0 && check.report.outages >= check.threshold) {
         notifyOption.notify =
           notifyOption.notify ||
-          (check.report.outages + 1) % check.threshold === 0;
+          (+check.report.outages + 1) % +check.threshold === 0;
       }
 
       notifyOption.status = ServerStatus.DOWN;
@@ -116,8 +126,8 @@ export const updateReport = async (checkID: number, intervalID: any) => {
   } catch (err) {
     clearInterval(intervalID);
     logger.error(err);
+    return;
   }
-
   if (notifyOption.notify) {
     try {
       await notifyUserForReport(check, notifyOption.status);
@@ -128,18 +138,18 @@ export const updateReport = async (checkID: number, intervalID: any) => {
   try {
     const report = check.report;
     const uptime =
-      report.uptime +
+      +report.uptime +
       (notifyOption.status === ServerStatus.UP ? check.interval * 60 : 0);
     const downtime =
-      report.downtime +
+      +report.downtime +
       (notifyOption.status === ServerStatus.DOWN ? check.interval * 60 : 0);
 
     await reportsRepository.update(report.id, {
-      alertTimes: report.alertTimes + (notifyOption.notify ? 1 : 0),
+      alertTimes: +report.alertTimes + (notifyOption.notify ? 1 : 0),
       history: [...report.history, new Date()],
       status: notifyOption.status,
       outages:
-        report.outages + (notifyOption.status === ServerStatus.DOWN ? 1 : 0),
+        +report.outages + (notifyOption.status === ServerStatus.DOWN ? 1 : 0),
       responseTimes: [...report.responseTimes, duration],
       uptime,
       downtime,

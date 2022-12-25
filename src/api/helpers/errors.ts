@@ -1,3 +1,4 @@
+import { logger } from "./../../pkgs";
 import { isInstance, ValidationError } from "class-validator";
 import { StatusCodes } from "http-status-codes";
 import { QueryFailedError } from "typeorm";
@@ -22,7 +23,7 @@ export const errorResponse = (message: string, code: number) =>
   new HttpError(message, code);
 
 export const serverErrorResponse = (err: any) => {
-  console.error(err);
+  logger.error(err);
   return errorResponse(
     "the server encountered a problem and could not process your request",
     StatusCodes.INTERNAL_SERVER_ERROR
