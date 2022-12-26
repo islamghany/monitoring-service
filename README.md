@@ -6,13 +6,17 @@ monitoring RESTful API server that allows authenticated users to monitor URLs, a
 
 **docker compose is required**
 
-1.  first thing is to clone the repo into your device via
+first thing is to clone the repo into your device via
 
 ```bash
 git clone https://github.com/islamghany/monitoring-service.git
 ```
 
-2. go the repo directory and build up the project via
+open the `.env` file inside monitoring-service directory then add your gmail account and your the app password.
+
+to get your app password look at this [article](https://miracleio.me/snippets/use-gmail-with-nodemailer/)
+
+go to the repo directory and build up the project via
 
 ```bash
 docker compose up --build
@@ -22,4 +26,4 @@ now it well take few seconds to download up all images needed for the applicatio
 
 ## Usage
 
-to inter act with the APIs via the OpenAPI Dashboard go to [http://localhost:8080/v1/api-docs](http://localhost:8080/v1/api-docs)
+to interact with the APIs via the OpenAPI Dashboard go to [http://localhost:8080/v1/api-docs](http://localhost:8080/v1/api-docs)

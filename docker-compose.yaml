@@ -20,7 +20,6 @@ services:
     depends_on:
       - postgres
     environment:
-      - PRIVATE_KEY="*F-JaNdRgUkXn2r5u8x/A?D(G+KbPeShVmYq3s6v9yB&E)H@McQfTjWnZr4u7w!"
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=islamghany
       - POSTGRES_DB=monitoring
