@@ -62,7 +62,7 @@ export class Report {
   responseTimes: number[];
 
   @Column({
-    type: "date",
+    type: "timestamp",
     array: true,
     default: [],
   })

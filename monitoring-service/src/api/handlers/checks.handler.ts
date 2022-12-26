@@ -14,6 +14,8 @@ import { CreateCheckDto, IDParamDto, ListCheckParamsDto } from "../../db/dto";
 import { IRequest } from "../../types";
 import { failedValidationResponse } from "../helpers/errors";
 import { createReport, updateReport } from "./reports.handlers";
+import scheduler from "../helpers/schedular";
+import { Report } from "src/db/entities/Report";
 
 export const createCheck = async (
   req: IRequest,
@@ -33,7 +35,7 @@ export const createCheck = async (
     return next(errorResponse("invalid url", StatusCodes.UNPROCESSABLE_ENTITY));
   }
   let checkPlaceholder: any = input;
-  let intervalId: number | string = 0;
+  let checkId: number = 0;
   try {
     // #TODO : wrap this block with a transaction
 
@@ -48,7 +50,7 @@ export const createCheck = async (
       // rollback
       next(serverErrorResponse("no rows was added in checks"));
     }
-    const checkId = check.raw[0].id;
+    checkId = check.raw[0].id;
 
     const report = await createReport(check.raw[0].id);
 
@@ -57,10 +59,15 @@ export const createCheck = async (
       next(serverErrorResponse("no rows was added in report"));
     }
 
-    intervalId = setInterval(updateReport, input.interval * 20 * 1000, checkId);
+    //intervalId = setInterval(updateReport, input.interval * 20 * 1000, checkId);
 
-    const updatedCheck = checksRepository.update(checkId, {
-      intervalId: +intervalId,
+    scheduler.New(checkId, scheduler.timeParaser(input.interval), () =>
+      updateReport(checkId)
+    );
+
+    scheduler.Start(checkId);
+
+    await checksRepository.update(checkId, {
       report: {
         id: report.raw[0].id,
       },
@@ -71,7 +78,7 @@ export const createCheck = async (
       ...check.raw[0],
     });
   } catch (err) {
-    if (intervalId) clearInterval(intervalId);
+    scheduler.Stop(checkId);
     return next(serverErrorResponse(err));
   }
 };
@@ -90,16 +97,13 @@ export const listChecks = async (
   }
 
   try {
-    // TODO: create indexs
-    // CREATE INDEX IF NOT EXISTS check_name_idx ON check USING GIN (to_tsvector('simple', name));
-    // CREATE INDEX IF NOT EXISTS check_tags_idx ON check USING GIN (tags);
-
     const tag = input.tag || "";
     const name = input.name || "";
 
     const checks = await checksRepository
-      .createQueryBuilder()
+      .createQueryBuilder("check")
       .select("*")
+      .leftJoinAndSelect("check.report", "report")
       .where(
         "(to_tsvector('simple', name) @@ plainto_tsquery('simple', :name) OR :name = '')",
         { name }
@@ -233,9 +237,9 @@ export const deleteCheck = async (
 
     // stop  running interval for this check;
 
-    await checksRepository.delete(check.id);
+    await checksRepository.delete(input.id);
 
-    clearInterval(check.intervalId);
+    scheduler.Stop(check.id);
   } catch (err) {
     next(serverErrorResponse(err));
   }

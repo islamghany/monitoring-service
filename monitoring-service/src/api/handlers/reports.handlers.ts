@@ -7,6 +7,7 @@ import { ServerStatus } from "../../types/enums";
 import { prepareRequest, PrepareRequestType } from "../helpers/perpareRequest";
 import { checksRepository, reportsRepository } from "./../../db/index";
 import { NotifyOption } from "../../types";
+import scheduler from "../helpers/schedular";
 
 const notifyUserForReport = async (check: Check, status: string) => {
   try {
@@ -65,7 +66,6 @@ const monitorCheck = async (
 };
 export const updateReport = async (checkID: number) => {
   let check: Check | null = null;
-  let intervalID: any = 0;
   try {
     check = await checksRepository.findOne({
       where: {
@@ -77,25 +77,23 @@ export const updateReport = async (checkID: number) => {
       },
     });
   } catch (err) {
-    clearInterval(intervalID);
+    scheduler.Stop(checkID);
     logger.error(err);
     return;
   }
   // if it was deleted
   if (!check) {
-    clearInterval(intervalID);
+    scheduler.Stop(checkID);
     logger.error(
       `the check with the id ${check} is not found when trying to monitring it, maybe it deleted`
     );
     return;
   }
-  intervalID = check.intervalId;
-
   let requestData: PrepareRequestType;
   try {
     requestData = prepareRequest(check);
   } catch (err) {
-    clearInterval(intervalID);
+    scheduler.Stop(checkID);
     logger.error(`invalid url ${check.url}`);
     return;
   }
@@ -127,7 +125,7 @@ export const updateReport = async (checkID: number) => {
       notifyOption.status = ServerStatus.DOWN;
     }
   } catch (err) {
-    clearInterval(intervalID);
+    scheduler.Stop(checkID);
     logger.error(err);
     return;
   }
@@ -159,7 +157,7 @@ export const updateReport = async (checkID: number) => {
       availability: uptime / (uptime + downtime),
     });
   } catch (err) {
-    clearInterval(intervalID);
+    scheduler.Stop(checkID);
     logger.error(err);
   }
 };

@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
+import { config } from "../../config";
 
 export interface TokenPayload {
   id: number;
   email: string;
 }
-const privateKey = process.env?.PRIVATE_KEY as string;
+const privateKey = config.PRIVATE_KEY;
 export const generateToken = (
   payload: TokenPayload,
   ttl: string | number | undefined

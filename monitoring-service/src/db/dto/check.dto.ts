@@ -92,6 +92,7 @@ export class CreateCheckDto {
   @IsOptional()
   @IsPositive()
   @IsInt()
+  @Max(518400) // 1 year
   interval: number;
 
   @IsOptional()

@@ -72,12 +72,6 @@ export class Check {
 
   @Column({
     type: "int",
-    nullable: true,
-  })
-  intervalId: number;
-
-  @Column({
-    type: "int",
     default: 1,
   })
   threshold: number;

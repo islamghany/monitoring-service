@@ -1,4 +1,7 @@
-require("dotenv").config();
+import path from "path";
+require("dotenv").config({
+  path: path.resolve(process.cwd(), "prod.env"),
+});
 import express, { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { logger } from "./pkgs";
@@ -10,7 +13,6 @@ import { notFoundResponse, HttpError } from "./api/helpers/errors";
 
 // docs
 import fs from "fs";
-import path from "path";
 import swaggerUi from "swagger-ui-express";
 
 const swaggerData = fs.readFileSync(
