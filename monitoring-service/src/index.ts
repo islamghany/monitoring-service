@@ -1,7 +1,5 @@
 import path from "path";
-require("dotenv").config({
-  path: path.resolve(process.cwd(), "prod.env"),
-});
+require("dotenv").config();
 import express, { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { logger } from "./pkgs";
